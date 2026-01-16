@@ -1,1 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DJ Console</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Media Container -->
+    <div id="bg-media-container">
+        <video id="bg-video" loop muted playsinline></video>
+        <img id="bg-image" alt="Background">
+        <div class="bg-overlay"></div>
+    </div>
+
+    <!-- Spotlights -->
+    <div class="spotlight-group left">
+        <div class="spotlight s1"></div>
+        <div class="spotlight s2"></div>
+        <div class="spotlight s3"></div>
+    </div>
+    <div class="spotlight-group right">
+        <div class="spotlight s1"></div>
+        <div class="spotlight s2"></div>
+        <div class="spotlight s3"></div>
+    </div>
+
+    <!-- Top Global Waveform (Overview) -->
+    <div class="top-bar">
+        <canvas id="global-wave-canvas"></canvas>
+        <div class="app-title">KINGKONG <span style="color:#e91e63">GO.TO</span> BAR</div>
+        <canvas id="top-melody-canvas"></canvas>
+    </div>
+
+    <!-- Main DJ Interface -->
+    <div id="ambient-light"></div>
+    <canvas id="visualizer"></canvas>
+    <audio id="audio" crossOrigin="anonymous"></audio>
+
+    <div class="dj-deck-right">
+        <div id="vinyl-container">
+            <img id="vinyl-image" src="C:\Users\Administrator\Pictures\—Pngtree—trend gorilla dj vector_17332132.png" alt="DJ Gorilla">
+        </div>
+        <div class="knob-panel">
+            <div class="knob-group">
+                <div class="led-ring"></div>
+                <div class="knob" data-control="gain"></div>
+                <span>GAIN</span>
+            </div>
+            <div class="knob-group">
+                <div class="led-ring"></div>
+                <div class="knob" data-control="high"></div>
+                <span>HIGH</span>
+            </div>
+            <div class="knob-group">
+                <div class="led-ring"></div>
+                <div class="knob" data-control="mid"></div>
+                <span>MID</span>
+            </div>
+            <div class="knob-group">
+                <div class="led-ring"></div>
+                <div class="knob" data-control="low"></div>
+                <span>LOW</span>
+            </div>
+        </div>
+    </div>
+
+    <div id="mixer-console">
+        <!-- Marquee Box (Inserted here to be part of mixer group or just above it) -->
+        <div class="marquee-box">
+            <div class="marquee-content">
+                <span>KINGKONG GO.TO BAR ✦ MUSIC WORLD FREE ✦ GROUP TÈ LÉ FULL NHẠC TRÔI ✦ NHẠC TUƠI TRONG BIO ✦ </span>
+                <span>KINGKONG GO.TO BAR ✦ MUSIC WORLD FREE ✦ GROUP TÈ LÉ FULL NHẠC TRÔI ✦ NHẠC TUƠI TRONG BIO ✦ </span>
+            </div>
+        </div>
+
+        <div class="mixer-section">
+            <div class="fader-group">
+                <input type="range" min="0" max="100" value="80" class="fader vertical" id="vol-fader">
+                <span>VOL</span>
+            </div>
+            <div class="fader-group">
+                <input type="range" min="0" max="100" value="60" class="fader vertical" id="bass-fader">
+                <span>BASS</span>
+            </div>
+        </div>
+
+        <!-- TIMELINE BAR (NEW) -->
+        <div class="timeline-container">
+            <div class="timeline-track">
+                <div class="timeline-progress" id="progress-bar"></div>
+                <div class="timeline-spark" id="progress-spark"></div>
+            </div>
+            <input type="range" id="seek-slider" min="0" max="100" value="0">
+            <div class="time-display-main">
+                <span id="current-time">00:00</span> / <span id="total-duration">00:00</span>
+            </div>
+        </div>
+
+        <div class="mixer-controls">
+            <div class="lcd-display">
+                <span id="track-name">NO TRACK LOADED</span>
+                <span id="track-time">00:00</span>
+            </div>
+            <div class="button-row">
+                <button id="add-music-btn" class="pad-btn">MUSIC</button>
+                <button id="add-bg-btn" class="pad-btn">SCENE</button>
+                <button id="play-pause-btn" class="pad-btn play">PLAY</button>
+                <button id="skip-btn" class="pad-btn">SKIP</button>
+            </div>
+            <div class="effect-row">
+                <button class="effect-btn" data-effect="neon">NEON</button>
+                <button class="effect-btn" data-effect="fire">FIRE</button>
+                <button class="effect-btn" data-effect="electric">ELEC</button>
+                <button class="effect-btn" data-effect="cyber">CYBER</button>
+            </div>
+        </div>
+        
+        <input type="file" id="file-input" accept="audio/*" multiple style="display: none;">
+        <input type="file" id="bg-input" accept="image/*,video/*" style="display: none;">
+    </div>
+
+    <!-- NEW PLAYLIST PANEL (Bottom Right) -->
+    <div id="playlist-panel" class="playlist-panel">
+        <div class="playlist-header">PLAYLIST</div>
+        <ul id="playlist-items"></ul>
+    </div>
+
+    <!-- NEW STATS PANEL (Left Side) -->
+    <div id="stats-panel" class="stats-panel">
+        <div class="stat-item">
+            <span class="stat-label">BPM</span>
+            <span class="stat-value" id="stat-bpm">128</span>
+            <canvas class="stat-wave" id="wave-bpm"></canvas>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">ENERGY</span>
+            <span class="stat-value" id="stat-energy">0%</span>
+            <canvas class="stat-wave" id="wave-energy"></canvas>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">BASS</span>
+            <span class="stat-value" id="stat-bass">0dB</span>
+            <canvas class="stat-wave" id="wave-bass"></canvas>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">TREBLE</span>
+            <span class="stat-value" id="stat-treble">0dB</span>
+            <canvas class="stat-wave" id="wave-treble"></canvas>
+        </div>
+    </div>
+
+    <!-- VISUALIZER SETTINGS PANEL -->
+    <div id="viz-settings-panel" class="viz-settings-panel hidden">
+        <div class="viz-header">
+            <span>VISUALIZER FX</span>
+            <button id="close-viz-settings">✕</button>
+        </div>
+        
+        <div class="viz-content">
+            <div class="viz-control-group">
+                <label>EFFECT TYPE</label>
+                <div class="viz-type-grid">
+                    <button class="viz-type-btn active" data-type="wave">WAVE</button>
+                    <button class="viz-type-btn" data-type="bars">BARS</button>
+                    <button class="viz-type-btn" data-type="circle">CIRCLE</button>
+                    <button class="viz-type-btn" data-type="dual">DUAL</button>
+                </div>
+            </div>
+
+            <div class="viz-control-group">
+                <div class="viz-label-row">
+                    <label>SIZE / AMPLITUDE</label>
+                    <span id="val-size" class="viz-val">1.0</span>
+                </div>
+                <input type="range" id="viz-size" min="0.1" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="viz-control-group">
+                <div class="viz-label-row">
+                    <label>SHAPE / WIDTH</label>
+                    <span id="val-shape" class="viz-val">10</span>
+                </div>
+                <input type="range" id="viz-shape" min="1" max="100" value="10">
+            </div>
+
+            <div class="viz-control-group">
+                <div class="viz-label-row">
+                    <label>POSITION Y</label>
+                    <span id="val-pos-y" class="viz-val">0</span>
+                </div>
+                <input type="range" id="viz-pos-y" min="-300" max="300" value="0">
+            </div>
+
+            <div class="viz-control-group">
+                <label>COLOR MODE</label>
+                <select id="viz-color-mode">
+                    <option value="auto">AUTO (THEME)</option>
+                    <option value="custom">CUSTOM</option>
+                </select>
+            </div>
+
+            <div class="viz-control-group custom-colors" id="custom-colors-group" style="display: none;">
+                <div class="color-picker-row">
+                    <input type="color" id="viz-color-1" value="#00ffff">
+                    <label>MAIN</label>
+                </div>
+                <div class="color-picker-row">
+                    <input type="color" id="viz-color-2" value="#ff00ff">
+                    <label>SEC</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Toggle Button -->
+    <button id="viz-settings-toggle" class="viz-settings-toggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+        </svg>
+    </button>
+
+
+    <script src="script.js"></script>
+</body>
+</html>
 
